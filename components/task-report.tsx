@@ -4,7 +4,8 @@ import { Task } from '@/lib/supabase/types';
 import { Button } from '@/components/ui/button';
 import { FileDown } from 'lucide-react';
 import { format } from 'date-fns';
-import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import dynamic from 'next/dynamic';
 
 interface TaskReportProps {
   tasks: Task[];
@@ -92,6 +93,20 @@ const TaskPDF = ({ tasks }: TaskReportProps) => {
     </Document>
   );
 };
+
+// Dynamic import of PDFDownloadLink to avoid SSR issues
+const PDFDownloadLink = dynamic(
+  () => import('@react-pdf/renderer').then(mod => mod.PDFDownloadLink),
+  { 
+    ssr: false,
+    loading: () => (
+      <Button disabled>
+        <FileDown className="h-4 w-4 mr-2" />
+        Loading PDF...
+      </Button>
+    )
+  }
+);
 
 export function TaskReport({ tasks }: TaskReportProps) {
   return (
